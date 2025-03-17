@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pair Maker b5</title>
+    <title>Pair Maker b6</title>
     <style>
         body {
             background-color: #1E1E1E;
@@ -232,8 +232,10 @@ function removePair(pair) {
 function copyPairs() {
     // Копируем только ID в формате "ID1,ID2"
     const text = pairs.map(pair => {
-        const pairItems = pair.split(",");
-        return `${pairItems[0]},${pairItems[1]}`; // Только ID, разделенные запятой
+        const pairItems = pair.split("|"); // Разделяем по символу "|"
+        const id1 = pairItems[0].trim(); // Получаем первый элемент (ID1)
+        const id2 = pairItems[1].trim(); // Получаем второй элемент (ID2)
+        return `${id1},${id2}`; // Только ID, разделенные запятой
     }).join("\n");
 
     navigator.clipboard.writeText(text).then(() => {
@@ -259,6 +261,7 @@ function copyPairs() {
         console.error("Clipboard write failed:", err);
     });
 }
+
 
 
 function toggleFavorite(item) {
