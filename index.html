@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pair Maker</title>
+    <style>
+        body {
+            background-color: #1E1E1E;
+            color: #E0E0E0;
+            font-family: Arial, sans-serif;
+           
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 800px;
+        }
+
+        input, button {
+            width: 93%;
+            padding: 10px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input {
+            background-color: #2E2E2E;
+            color: white;
+        }
+        button {
+            background: #444;
+            color: white;
+            border: none;
+            padding: 5px;
+            margin: 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #666;
+        }
+
+       
+
+        .scroll-container {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        .pair-list {
+            margin-top: 10px;
+        }
+
+       .pair-item {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    border-bottom: 1px solid #444;
+}
+
+.pair-item .text {
+    flex-grow: 1;  /* Текст занимает все доступное пространство */
+    text-align: left;  /* Текст выравнивается по левому краю */
+}
+
+.pair-item button {
+    padding: 5px 10px;  /* Уменьшаем отступы внутри кнопок */
+    margin-left: 5px;  /* Отступ между кнопкой и текстом */
+    border: none;
+    border-radius: 5px;
+    background: #444;
+    color: white;
+    cursor: pointer;
+    font-size: 12px;  /* Уменьшаем размер текста */
+    text-align: center;  /* Текст в кнопке выравнивается по центру */
+    width: auto;  /* Кнопки не растягиваются */
+    max-width: 30%;  /* Максимальная ширина кнопок 30% */
+}
+
+.pair-item button:hover {
+    background: #666;
+}
+
+@media (max-width: 600px) {
+    .pair-item button {
+        font-size: 10px;  /* Еще меньше размер текста на мобильных устройствах */
+    }
+}
+
+
+
+        .scroll-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 5px;
+        }
+
+        .scroll-container::-webkit-scrollbar-track {
+            background: #2E2E2E;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 100%;
+                padding: 10px;
+            }
+
+           
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <input type="text" id="search" placeholder="Введите текст для поиска..." oninput="updateResults()">
+        
+        <div class="scroll-container" id="favorites"></div>
+        <div class="scroll-container" id="results"></div>
+
+        <button onclick="addPair()">ADD</button>
+        <p id="current-selection">New: None | Old: None</p>
+
+        <div class="scroll-container pair-list" id="pairs"></div>
+        <button onclick="copyPairs()">COPY</button>
+    </div>
+
+    <script>
+        let items = [];
+        let favorites = [];
+        let leftItem = null;
+        let rightItem = null;
+        let pairs = [];
+
+        function loadFiles() {
+            fetch("items.txt").then(response => response.text()).then(text => {
+                items = text.trim().split("\n").map(line => line.trim()).filter(line => line);
+                updateResults();
+            });
+
+            fetch("my.txt").then(response => response.text()).then(text => {
+                favorites = text.trim().split("\n").map(line => line.trim()).filter(line => line);
+                updateResults();
+            });
+        }
+
+        function updateResults() {
+            const query = document.getElementById("search").value.toLowerCase();
+            const resultsContainer = document.getElementById("results");
+            resultsContainer.innerHTML = "";
+
+            const filtered = items.filter(item => item.toLowerCase().includes(query)).slice(0, 100);
+            filtered.forEach(item => createResultBlock(item, resultsContainer));
+
+            const favoritesContainer = document.getElementById("favorites");
+            favoritesContainer.innerHTML = "";
+            favorites.forEach(item => createResultBlock(item, favoritesContainer, true));
+        }
+
+        function createResultBlock(item, container, isFavorite = false) {
+            const div = document.createElement("div");
+            div.className = "pair-item";
+            div.innerHTML = `
+                <span>${item}</span>
+                <button onclick="selectItem('${item}', 'left')">New</button>
+                <button onclick="selectItem('${item}', 'right')">Old</button>
+                <button onclick="toggleFavorite('${item}')">${isFavorite ? "❌" : "💚"}</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function selectItem(item, type) {
+            if (type === "left") {
+                leftItem = item;
+            } else {
+                rightItem = item;
+            }
+            document.getElementById("current-selection").textContent = `New: ${leftItem || "None"} | Old: ${rightItem || "None"}`;
+        }
+
+        function addPair() {
+            if (leftItem && rightItem) {
+                const newPair = `${leftItem},${rightItem}`;
+                if (!pairs.includes(newPair)) {
+                    pairs.push(newPair);
+                    updatePairsList();
+                }
+            }
+        }
+
+        function updatePairsList() {
+            const pairsContainer = document.getElementById("pairs");
+            pairsContainer.innerHTML = "";
+            pairs.forEach(pair => {
+                const div = document.createElement("div");
+                div.className = "pair-item";
+                div.innerHTML = `<span>${pair.replace(",", " - ")}</span> <button onclick="removePair('${pair}')">✖</button>`;
+                pairsContainer.appendChild(div);
+            });
+        }
+
+        function removePair(pair) {
+            pairs = pairs.filter(p => p !== pair);
+            updatePairsList();
+        }
+
+        function copyPairs() {
+            const text = pairs.join("\n");
+            navigator.clipboard.writeText(text).then(() => alert("Скопировано!"));
+        }
+
+        function toggleFavorite(item) {
+            if (favorites.includes(item)) {
+                favorites = favorites.filter(fav => fav !== item);
+            } else {
+                favorites.push(item);
+            }
+            saveFavorites();
+            updateResults();
+        }
+
+        function saveFavorites() {
+            fetch("my.txt", {
+                method: "POST",
+                body: favorites.join("\n"),
+                headers: { "Content-Type": "text/plain" }
+            });
+        }
+
+        window.onload = loadFiles;
+    </script>
+</body>
+</html>
