@@ -50,7 +50,7 @@
        
 
         .scroll-container {
-            max-height: 250px;
+            max-height: 300px;
             overflow-y: auto;
             border: 1px solid #444;
             border-radius: 5px;
@@ -124,14 +124,14 @@
 </head>
 <body>
     <div class="container">
-        <input type="text" id="search" placeholder="Введите текст для поиска..." oninput="updateResults()">
-        
-        <div class="scroll-container" id="favorites"></div>
+        <input type="text" id="search" placeholder="Seach by id" oninput="updateResults()">
         <div class="scroll-container" id="results"></div>
+        <div class="scroll-container" id="favorites"></div>
+        
 
-        <button onclick="addPair()">ADD</button>
+        
         <p id="current-selection">New: None | Old: None</p>
-
+        <button onclick="addPair()">ADD</button>
         <div class="scroll-container pair-list" id="pairs"></div>
         <button onclick="copyPairs()">COPY</button>
     </div>
