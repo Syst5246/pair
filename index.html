@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pair Maker b2</title>
+    <title>Pair Maker b3</title>
     <style>
         body {
             background-color: #1E1E1E;
@@ -69,22 +69,22 @@
 }
 
 .pair-item .text {
-    flex-grow: 1;  /* Текст занимает все доступное пространство */
-    text-align: left;  /* Текст выравнивается по левому краю */
+    flex-grow: 1;  
+    text-align: left;  
 }
 
 .pair-item button {
-    padding: 5px 10px;  /* Уменьшаем отступы внутри кнопок */
-    margin-left: 5px;  /* Отступ между кнопкой и текстом */
+    padding: 5px 10px; 
+    margin-left: 5px;  
     border: none;
     border-radius: 5px;
     background: #444;
     color: white;
     cursor: pointer;
-    font-size: 12px;  /* Уменьшаем размер текста */
-    text-align: center;  /* Текст в кнопке выравнивается по центру */
-    width: auto;  /* Кнопки не растягиваются */
-    max-width: 30%;  /* Максимальная ширина кнопок 30% */
+    font-size: 12px;  
+    text-align: center; 
+    width: auto; 
+    max-width: 30%;  
 }
 
 .pair-item button:hover {
@@ -93,7 +93,7 @@
 
 @media (max-width: 600px) {
     .pair-item button {
-        font-size: 10px;  /* Еще меньше размер текста на мобильных устройствах */
+        font-size: 10px;  
     }
 }
 
@@ -172,7 +172,7 @@ function createResultBlock(item, container, isFavorite = false) {
     const div = document.createElement("div");
     div.className = "pair-item";
     div.innerHTML = `
-        <span>${item}</span>
+        <span>${getItemNameByID(item)}</span>
         <button onclick="selectItem('${item}', 'left')">New</button>
         <button onclick="selectItem('${item}', 'right')">Old</button>
         <button onclick="toggleFavorite('${item}')">${isFavorite ? "❌" : "💚"}</button>
@@ -186,7 +186,7 @@ function selectItem(item, type) {
     } else {
         rightItem = item;
     }
-    document.getElementById("current-selection").textContent = `New: ${leftItem || "None"} | Old: ${rightItem || "None"}`;
+    document.getElementById("current-selection").textContent = `New: ${getItemNameByID(leftItem) || "None"} | Old: ${getItemNameByID(rightItem) || "None"}`;
 }
 
 function addPair() {
@@ -204,10 +204,10 @@ function updatePairsList() {
     pairsContainer.innerHTML = "";
     pairs.forEach(pair => {
         const pairItems = pair.split(",");
-        const leftID = pairItems[0]; // ID левого элемента
-        const rightID = pairItems[1]; // ID правого элемента
+        const leftID = pairItems[0]; 
+        const rightID = pairItems[1]; 
 
-        // Получаем название по ID
+       
         const leftName = getItemNameByID(leftID);
         const rightName = getItemNameByID(rightID);
 
@@ -219,9 +219,9 @@ function updatePairsList() {
 }
 
 function getItemNameByID(id) {
-    // Поиск названия элемента по ID
+   
     const item = items.find(item => item.startsWith(id));
-    return item ? item.split("|")[1].trim() : id; // Если название найдено, возвращаем его, иначе возвращаем сам ID
+    return item ? item.split("|")[1].trim() : id; 
 }
 
 function removePair(pair) {
@@ -230,10 +230,10 @@ function removePair(pair) {
 }
 
 function copyPairs() {
-    // Копируем только ID в формате "ID1,ID2"
+  
     const text = pairs.map(pair => pair.split(",")[0] + "," + pair.split(",")[1]).join("\n");
     navigator.clipboard.writeText(text).then(() => {
-        // Создание временного сообщения об успешном копировании
+       
         const feedback = document.createElement("div");
         feedback.textContent = "Скопировано!";
         feedback.style.position = "fixed";
@@ -247,7 +247,7 @@ function copyPairs() {
         feedback.style.fontSize = "16px";
         document.body.appendChild(feedback);
 
-        // Удалить сообщение через 2 секунды
+        
         setTimeout(() => {
             feedback.remove();
         }, 2000);
@@ -275,6 +275,7 @@ function saveFavorites() {
 }
 
 window.onload = loadFiles;
+
 
 
     </script>
