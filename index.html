@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pair Maker b3</title>
+    <title>Pair Maker b4</title>
     <style>
         body {
             background-color: #1E1E1E;
@@ -137,7 +137,7 @@
     </div>
 
     <script>
-        let items = [];
+   let items = [];
 let favorites = [];
 let leftItem = null;
 let rightItem = null;
@@ -204,10 +204,10 @@ function updatePairsList() {
     pairsContainer.innerHTML = "";
     pairs.forEach(pair => {
         const pairItems = pair.split(",");
-        const leftID = pairItems[0]; 
-        const rightID = pairItems[1]; 
+        const leftID = pairItems[0]; // ID левого элемента
+        const rightID = pairItems[1]; // ID правого элемента
 
-       
+        // Получаем название по ID
         const leftName = getItemNameByID(leftID);
         const rightName = getItemNameByID(rightID);
 
@@ -219,9 +219,9 @@ function updatePairsList() {
 }
 
 function getItemNameByID(id) {
-   
+    // Поиск названия элемента по ID
     const item = items.find(item => item.startsWith(id));
-    return item ? item.split("|")[1].trim() : id; 
+    return item ? item.split("|")[1].trim() : id; // Если название найдено, возвращаем его, иначе возвращаем сам ID
 }
 
 function removePair(pair) {
@@ -230,10 +230,14 @@ function removePair(pair) {
 }
 
 function copyPairs() {
-  
-    const text = pairs.map(pair => pair.split(",")[0] + "," + pair.split(",")[1]).join("\n");
+    // Копируем только ID в формате "ID1,ID2"
+    const text = pairs.map(pair => {
+        const pairItems = pair.split(",");
+        return `${pairItems[0]},${pairItems[1]}`; // Только ID
+    }).join("\n");
+
     navigator.clipboard.writeText(text).then(() => {
-       
+        // Создание временного сообщения об успешном копировании
         const feedback = document.createElement("div");
         feedback.textContent = "Скопировано!";
         feedback.style.position = "fixed";
@@ -247,7 +251,7 @@ function copyPairs() {
         feedback.style.fontSize = "16px";
         document.body.appendChild(feedback);
 
-        
+        // Удалить сообщение через 2 секунды
         setTimeout(() => {
             feedback.remove();
         }, 2000);
@@ -267,6 +271,7 @@ function toggleFavorite(item) {
 }
 
 function saveFavorites() {
+    // Обновляем файл my.txt с новыми избранными элементами
     fetch("my.txt", {
         method: "POST",
         body: favorites.join("\n"),
@@ -275,6 +280,7 @@ function saveFavorites() {
 }
 
 window.onload = loadFiles;
+
 
 
 
