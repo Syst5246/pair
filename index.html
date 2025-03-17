@@ -138,58 +138,58 @@
 
     <script>
         let items = [];
-        let favorites = [];
-        let leftItem = null;
-        let rightItem = null;
-        let pairs = [];
+let favorites = [];
+let leftItem = null;
+let rightItem = null;
+let pairs = [];
 
-        function loadFiles() {
-            fetch("items.txt").then(response => response.text()).then(text => {
-                items = text.trim().split("\n").map(line => line.trim()).filter(line => line);
-                updateResults();
-            });
+function loadFiles() {
+    fetch("items.txt").then(response => response.text()).then(text => {
+        items = text.trim().split("\n").map(line => line.trim()).filter(line => line);
+        updateResults();
+    });
 
-            fetch("my.txt").then(response => response.text()).then(text => {
-                favorites = text.trim().split("\n").map(line => line.trim()).filter(line => line);
-                updateResults();
-            });
-        }
+    fetch("my.txt").then(response => response.text()).then(text => {
+        favorites = text.trim().split("\n").map(line => line.trim()).filter(line => line);
+        updateResults();
+    });
+}
 
-        function updateResults() {
-            const query = document.getElementById("search").value.toLowerCase();
-            const resultsContainer = document.getElementById("results");
-            resultsContainer.innerHTML = "";
+function updateResults() {
+    const query = document.getElementById("search").value.toLowerCase();
+    const resultsContainer = document.getElementById("results");
+    resultsContainer.innerHTML = "";
 
-            const filtered = items.filter(item => item.toLowerCase().includes(query)).slice(0, 100);
-            filtered.forEach(item => createResultBlock(item, resultsContainer));
+    const filtered = items.filter(item => item.toLowerCase().includes(query)).slice(0, 100);
+    filtered.forEach(item => createResultBlock(item, resultsContainer));
 
-            const favoritesContainer = document.getElementById("favorites");
-            favoritesContainer.innerHTML = "";
-            favorites.forEach(item => createResultBlock(item, favoritesContainer, true));
-        }
+    const favoritesContainer = document.getElementById("favorites");
+    favoritesContainer.innerHTML = "";
+    favorites.forEach(item => createResultBlock(item, favoritesContainer, true));
+}
 
-        function createResultBlock(item, container, isFavorite = false) {
-            const div = document.createElement("div");
-            div.className = "pair-item";
-            div.innerHTML = `
-                <span>${item}</span>
-                <button onclick="selectItem('${item}', 'left')">New</button>
-                <button onclick="selectItem('${item}', 'right')">Old</button>
-                <button onclick="toggleFavorite('${item}')">${isFavorite ? "❌" : "💚"}</button>
-            `;
-            container.appendChild(div);
-        }
+function createResultBlock(item, container, isFavorite = false) {
+    const div = document.createElement("div");
+    div.className = "pair-item";
+    div.innerHTML = `
+        <span>${item}</span>
+        <button onclick="selectItem('${item}', 'left')">New</button>
+        <button onclick="selectItem('${item}', 'right')">Old</button>
+        <button onclick="toggleFavorite('${item}')">${isFavorite ? "❌" : "💚"}</button>
+    `;
+    container.appendChild(div);
+}
 
-        function selectItem(item, type) {
-            if (type === "left") {
-                leftItem = item;
-            } else {
-                rightItem = item;
-            }
-            document.getElementById("current-selection").textContent = `New: ${leftItem || "None"} | Old: ${rightItem || "None"}`;
-        }
+function selectItem(item, type) {
+    if (type === "left") {
+        leftItem = item;
+    } else {
+        rightItem = item;
+    }
+    document.getElementById("current-selection").textContent = `New: ${leftItem || "None"} | Old: ${rightItem || "None"}`;
+}
 
-        function addPair() {
+function addPair() {
     if (leftItem && rightItem) {
         const newPair = `${leftItem},${rightItem}`;
         if (!pairs.includes(newPair)) {
@@ -214,13 +214,12 @@ function updatePairsList() {
     });
 }
 
+function removePair(pair) {
+    pairs = pairs.filter(p => p !== pair);
+    updatePairsList();
+}
 
-        function removePair(pair) {
-            pairs = pairs.filter(p => p !== pair);
-            updatePairsList();
-        }
-
-       function copyPairs() {
+function copyPairs() {
     const text = pairs.map(pair => pair.split(",").join("\n")).join("\n");
     navigator.clipboard.writeText(text).then(() => {
         // Создание временного сообщения об успешном копировании
@@ -246,27 +245,26 @@ function updatePairsList() {
     });
 }
 
+function toggleFavorite(item) {
+    if (favorites.includes(item)) {
+        favorites = favorites.filter(fav => fav !== item);
+    } else {
+        favorites.push(item);
+    }
+    saveFavorites();
+    updateResults();
+}
 
+function saveFavorites() {
+    fetch("my.txt", {
+        method: "POST",
+        body: favorites.join("\n"),
+        headers: { "Content-Type": "text/plain" }
+    });
+}
 
-        function toggleFavorite(item) {
-            if (favorites.includes(item)) {
-                favorites = favorites.filter(fav => fav !== item);
-            } else {
-                favorites.push(item);
-            }
-            saveFavorites();
-            updateResults();
-        }
+window.onload = loadFiles;
 
-        function saveFavorites() {
-            fetch("my.txt", {
-                method: "POST",
-                body: favorites.join("\n"),
-                headers: { "Content-Type": "text/plain" }
-            });
-        }
-
-        window.onload = loadFiles;
     </script>
 </body>
 </html>
