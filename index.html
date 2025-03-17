@@ -190,35 +190,40 @@
         }
 
         function addPair() {
-            if (leftItem && rightItem) {
-                const newPair = `${leftItem},${rightItem}`;
-                if (!pairs.includes(newPair)) {
-                    pairs.push(newPair);
-                    updatePairsList();
-                }
-            }
+    if (leftItem && rightItem) {
+        const newPair = `${leftItem},${rightItem}`;
+        if (!pairs.includes(newPair)) {
+            pairs.push(newPair);
+            updatePairsList();
         }
+    }
+}
 
-        function updatePairsList() {
-            const pairsContainer = document.getElementById("pairs");
-            pairsContainer.innerHTML = "";
-            pairs.forEach(pair => {
-                const div = document.createElement("div");
-                div.className = "pair-item";
-                div.innerHTML = `<span>${pair.replace(",", " - ")}</span> <button onclick="removePair('${pair}')">✖</button>`;
-                pairsContainer.appendChild(div);
-            });
-        }
+function updatePairsList() {
+    const pairsContainer = document.getElementById("pairs");
+    pairsContainer.innerHTML = "";
+    pairs.forEach(pair => {
+        const pairItems = pair.split(",");
+        const leftName = pairItems[0]; // Название левого элемента
+        const rightName = pairItems[1]; // Название правого элемента
+
+        const div = document.createElement("div");
+        div.className = "pair-item";
+        div.innerHTML = `<span>${leftName} - ${rightName}</span> <button onclick="removePair('${pair}')">✖</button>`;
+        pairsContainer.appendChild(div);
+    });
+}
+
 
         function removePair(pair) {
             pairs = pairs.filter(p => p !== pair);
             updatePairsList();
         }
 
-        function copyPairs() {
-    const text = pairs.join("\n");
+       function copyPairs() {
+    const text = pairs.map(pair => pair.split(",").join("\n")).join("\n");
     navigator.clipboard.writeText(text).then(() => {
-        // Create a temporary feedback message
+        // Создание временного сообщения об успешном копировании
         const feedback = document.createElement("div");
         feedback.textContent = "Скопировано!";
         feedback.style.position = "fixed";
@@ -232,7 +237,7 @@
         feedback.style.fontSize = "16px";
         document.body.appendChild(feedback);
 
-        // Remove the message after 2 seconds
+        // Удалить сообщение через 2 секунды
         setTimeout(() => {
             feedback.remove();
         }, 2000);
@@ -240,6 +245,7 @@
         console.error("Clipboard write failed:", err);
     });
 }
+
 
 
         function toggleFavorite(item) {
