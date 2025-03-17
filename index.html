@@ -204,8 +204,12 @@ function updatePairsList() {
     pairsContainer.innerHTML = "";
     pairs.forEach(pair => {
         const pairItems = pair.split(",");
-        const leftName = pairItems[0]; // Название левого элемента
-        const rightName = pairItems[1]; // Название правого элемента
+        const leftID = pairItems[0]; // ID левого элемента
+        const rightID = pairItems[1]; // ID правого элемента
+
+        // Получаем название по ID
+        const leftName = getItemNameByID(leftID);
+        const rightName = getItemNameByID(rightID);
 
         const div = document.createElement("div");
         div.className = "pair-item";
@@ -214,13 +218,20 @@ function updatePairsList() {
     });
 }
 
+function getItemNameByID(id) {
+    // Поиск названия элемента по ID
+    const item = items.find(item => item.startsWith(id));
+    return item ? item.split("|")[1].trim() : id; // Если название найдено, возвращаем его, иначе возвращаем сам ID
+}
+
 function removePair(pair) {
     pairs = pairs.filter(p => p !== pair);
     updatePairsList();
 }
 
 function copyPairs() {
-    const text = pairs.map(pair => pair.split(",").join("\n")).join("\n");
+    // Копируем только ID в формате "ID1,ID2"
+    const text = pairs.map(pair => pair.split(",")[0] + "," + pair.split(",")[1]).join("\n");
     navigator.clipboard.writeText(text).then(() => {
         // Создание временного сообщения об успешном копировании
         const feedback = document.createElement("div");
@@ -264,6 +275,7 @@ function saveFavorites() {
 }
 
 window.onload = loadFiles;
+
 
     </script>
 </body>
